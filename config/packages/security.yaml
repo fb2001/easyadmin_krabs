@@ -1,0 +1,45 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # Définition du fournisseur d'utilisateurs à partir de l'entité User
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User  # Assurez-vous que cette entité existe et est bien configurée
+                property: email  # Utilisation de l'email pour l'authentification
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false  # Désactive la sécurité pour les pages de développement
+
+        main:
+            lazy: true
+            provider: app_user_provider  # Utilisation du fournisseur d'utilisateurs configuré
+            form_login:
+                login_path: app_login  # Route pour afficher le formulaire de login
+                check_path: app_login  # Route pour vérifier les informations de connexion
+                enable_csrf: true      # Protection CSRF activée pour le formulaire de login
+            logout:
+                path: app_logout  # Route pour se déconnecter
+                target: app_login
+                # optionnellement, tu peux définir où rediriger après déconnexion
+                # target: app_homepage
+
+    # Contrôle d'accès pour restreindre certaines pages selon le rôle
+    access_control:
+        - { path: ^/admin, roles: ROLE_ADMIN }  # Accès administrateur pour les pages /admin
+        - { path: ^/login, roles: PUBLIC_ACCESS }  # Accès public pour la page de login
+
+# Configuration pour les tests
+when@test:
+    security:
+        password_hashers:
+            # Réduit la complexité du hashage pour les tests afin de réduire le temps de calcul
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Valeur minimale pour bcrypt
+                time_cost: 3 # Valeur minimale pour argon
+                memory_cost: 10 # Valeur minimale pour argon
