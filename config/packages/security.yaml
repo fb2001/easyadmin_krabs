@@ -17,11 +17,13 @@ security:
 
         main:
             lazy: true
-            provider: app_user_provider  # Utilisation du fournisseur d'utilisateurs configuré
+            provider: app_user_provider
             form_login:
-                login_path: app_login  # Route pour afficher le formulaire de login
-                check_path: app_login  # Route pour vérifier les informations de connexion
-                enable_csrf: true      # Protection CSRF activée pour le formulaire de login
+                login_path: app_login
+                check_path: app_login
+                username_parameter: _username
+                password_parameter: _password
+                enable_csrf: true
             logout:
                 path: app_logout  # Route pour se déconnecter
                 target: app_login
